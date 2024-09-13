@@ -1,0 +1,14 @@
+kafka:
+  hosts:
+    node10203:
+      ansible_host: 192.168.10.203
+      ansible_ssh_user: root
+      ansible_ssh_pass: jetio
+    node10204:
+      ansible_host: 192.168.10.204
+      ansible_ssh_user: root
+      ansible_ssh_pass: jetio
+    node10205:
+      ansible_host: 192.168.10.205
+      ansible_ssh_user: root
+      ansible_ssh_pass: jetio

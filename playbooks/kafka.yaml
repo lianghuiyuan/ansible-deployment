@@ -1,0 +1,9 @@
+- name: kafka deployment
+  hosts: kafka
+  remote_user: root
+  become: true
+  become_method: sudo
+  become_user: root
+  #become_ask_pass: false
+  roles:
+    - sleighzy.kafka

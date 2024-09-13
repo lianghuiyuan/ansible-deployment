@@ -1,0 +1,44 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+*.tar
+*.zip
+# not to ignore grafana-oncall-app-1.5.4.zip
+!grafana-oncall-app-1.5.4.zip
+
+.vscode
+# python env
+.venv
+venv
+mimirtool
+./tools/*
+./docker-images/*.tar
+./docker-images/*.tar.gz
+./docker-images/*.zip
+
+.scannerwork
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
