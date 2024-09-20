@@ -12,6 +12,10 @@ Icon
 # not to ignore grafana-oncall-app-1.5.4.zip
 !grafana-oncall-app-1.5.4.zip
 
+# ignore ansible vault password
+.vault_pass.txt
+.vault*.txt
+
 .vscode
 # python env
 .venv
@@ -42,3 +46,4 @@ mimirtool
 Network Trash Folder
 Temporary Items
 .apdisk
+.vault_pass.txt
