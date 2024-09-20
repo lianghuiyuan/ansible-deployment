@@ -1,11 +1,11 @@
 ---
 
-docker_registry: 'registry.jetio.net'
-registry_user: 'lianghuiyuan'
-registry_pwd: 'Qaz@1234'
+docker_registry: "{{ lookup('vault', '../passwords.yml:docker_registry') }}"
+registry_user: "{{ lookup('vault', '../passwords.yml:registry_user') }}"
+registry_pwd: "{{ lookup('vault', '../passwords.yml:registry_pwd') }}"
 ansible_become: yes
 ansible_become_method: sudo
-ansible_become_password: "Qaz@1234"
+ansible_become_password: "{{ lookup('vault', '../passwords.yml:ansible_become_password') }}"
 
 cpu_arch: "{{ (ansible_architecture | lower | 
               replace('i386', '386') | 
