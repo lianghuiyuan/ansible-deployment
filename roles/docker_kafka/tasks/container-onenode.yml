@@ -1,0 +1,95 @@
+---
+
+
+- name: container | remove kafka container
+  community.docker.docker_container:
+    name: kafka
+    state: absent
+  tags: ['install', 'untagged']
+
+- name: container | {{ docker_container_state }} kafka container
+  community.docker.docker_container:
+    name: 'kafka_1'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'kafka_1'
+    state: '{{ docker_container_state }}'
+    restart: '{{ docker_container_restart }}'
+    restart_policy: always
+    ports:
+      - "19092:9092"
+    volumes:
+      - '{{ kafka_log_dir }}:{{ container_log_dir }}'
+    env:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka_1:9093,2@kafka_2:9093,3@kafka_3:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:19092,PLAINTEXT_HOST://0.0.0.0:19092
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: '{{ container_log_dir }}'
+  tags: ['always']
+
+- name: container | {{ docker_container_state }} kafka container
+  community.docker.docker_container:
+    name: 'kafka_2'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'kafka_2'
+    state: '{{ docker_container_state }}'
+    restart: '{{ docker_container_restart }}'
+    restart_policy: always
+    ports:
+      - "29092:9092"
+    volumes:
+      - '{{ kafka_log_dir }}:{{ container_log_dir }}'
+    env:
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka_1:9093,2@kafka_2:9093,3@kafka_3:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:29092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: '{{ container_log_dir }}'
+  tags: ['always']
+
+- name: container | {{ docker_container_state }} kafka container
+  community.docker.docker_container:
+    name: 'kafka_3'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'kafka_3'
+    state: '{{ docker_container_state }}'
+    restart: '{{ docker_container_restart }}'
+    restart_policy: always
+    ports:
+      - "39092:9092"
+    volumes:
+      - '{{ kafka_log_dir }}:{{ container_log_dir }}'
+    env:
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka_1:9093,2@kafka_2:9093,3@kafka_3:9093'
+      KAFKA_LISTENERS: 'PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:39092,PLAINTEXT_HOST://0.0.0.0:39092
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: '{{ container_log_dir }}'
+  tags: ['always']

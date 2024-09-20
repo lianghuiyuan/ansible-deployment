@@ -1,0 +1,8 @@
+---
+host_outer_address: '47.99.102.51'
+host_inner_address: '192.168.10.204'
+service_ip: '{{ host_inner_address }}'
+
+kafka_broker_id: 2
+kafka_host_broker_port: 9092
+kafka_host_controller_port: 9093

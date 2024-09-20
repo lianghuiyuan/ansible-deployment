@@ -1,9 +1,8 @@
-- name: kafka deployment
-  hosts: kafka
-  remote_user: root
+- name: 'deploy kafka'
+  hosts: 'docker_kafka'
   become: true
   become_method: sudo
   become_user: root
-  #become_ask_pass: false
+  gather_facts: true
   roles:
-    - sleighzy.kafka
+    - { role: 'docker_kafka'}
