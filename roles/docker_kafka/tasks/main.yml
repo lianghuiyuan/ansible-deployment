@@ -27,7 +27,6 @@
 
 - name: main | login dockerhub, pull latest image and delete the expired image
   import_tasks: image.yml
-  tags: ['install']
 
-# - name: main | deploy kafka with docker
-#   import_tasks: container.yml
+- name: main | deploy kafka with docker
+  import_tasks: container.yml

@@ -1,15 +1,17 @@
 ---
 # pull save load distribute 
 
-# login private docker hub.
-# - name: 'image | Login into {{ docker_registry }}'
-#   local_action:
-#     community.docker.docker_login:
-#       registry: '{{ docker_registry }}'
-#       username: '{{ registry_user }}'
-#       password: '{{ registry_pwd }}'
-#       reauthorize: true
-#   tags: ['install']
+- name: Ensure directorys has correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: '0755'
+    recurse: yes
+  with_items: 
+    - '{{ image_archive_dir }}'
+  tags: ['install']
 
 - name: 'image | Login into {{ docker_registry }} on local machine'
   delegate_to: localhost
@@ -26,12 +28,10 @@
   community.docker.docker_image:
     name: '{{ image }}:{{ version }}'
     source: pull
-    # Select platform for pulling. If not specified, will pull whatever docker prefers.
-    pull:
-      platform: '{{ cpu_arch | lower }}'
   tags: ['install']
 
 - name: image | Log out of {{ docker_registry }} on local machine
+  delegate_to: localhost
   community.docker.docker_login:
     state: absent
   tags: ['install']
@@ -42,17 +42,22 @@
     name: '{{ image }}'
     tag: '{{ version }}'
     state: 'present'
-    archive_path: '{{ image_archive_name }}'
+    archive_path: '{{ image_local_dir }}/{{ image_archive_name }}'
     source: local
   tags: ['install']
 
 - name: Copy file with owner and permissions
   ansible.builtin.copy:
-    src: '{{ image_archive_name }}'
+    src: '{{ image_local_dir }}/{{ image_archive_name }}'
     dest: '{{ image_archive_dir }}/{{ image_archive_name }}'
     owner: root
     group: root
     mode: '0644'
+  tags: ['install']
+
+- name: Ensure Docker SDK for Python is installed
+  ansible.builtin.pip:
+    name: docker
   tags: ['install']
 
 - name: Load image from archive
@@ -66,9 +71,9 @@
 
 - name: Remove image
   community.docker.docker_image:
-    state: absent
     name: '{{ image }}'
     tag: '{{ version }}'
+    state: 'absent'
   tags: ['uninstall']
 
 # - name: Load all image(s) from the given tar file

@@ -15,7 +15,7 @@
   with_items: "{{ groups['docker_kafka'] }}"
   tags: ['always']
 
-- name: Ensure /opt/kafka has correct ownership
+- name: Ensure directorys has correct ownership
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
