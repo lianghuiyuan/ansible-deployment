@@ -60,14 +60,25 @@
 #     name: docker
 #   tags: ['load_images']
 
-- name: Load image from archive
-  community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
-    state: 'present'
-    load_path: '{{ image_archive_dir }}/{{ image_archive_name }}'
-    source: load
-  tags: ['load_images']
+# - name: Load image from archive
+#   community.docker.docker_image:
+#     name: '{{ image }}'
+#     tag: '{{ version }}'
+#     state: 'present'
+#     load_path: '{{ image_archive_dir }}/{{ image_archive_name }}'
+#     source: load
+#   tags: ['load_images']
+
+- name: Load all image(s) from the given tar file
+  community.docker.docker_image_load:
+    path: '{{ image_archive_dir }}/{{ image_archive_name }}'
+  register: result
+  tags: ['install']
+
+- name: Print the loaded image names
+  ansible.builtin.debug:
+    msg: "Loaded the following images: {{ result.image_names | join(', ') }}"
+  tags: ['install']  
 
 - name: Remove image
   community.docker.docker_image:
@@ -75,14 +86,3 @@
     tag: '{{ version }}'
     state: 'absent'
   tags: ['uninstall']
-
-# - name: Load all image(s) from the given tar file
-#   community.docker.docker_image_load:
-#     path: '{{ image_archive_dir }}/{{ image_archive_name }}'
-#   register: result
-#   tags: ['install']
-
-# - name: Print the loaded image names
-#   ansible.builtin.debug:
-#     msg: "Loaded the following images: {{ result.image_names | join(', ') }}"
-#   tags: ['install']
