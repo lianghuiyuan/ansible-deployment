@@ -55,10 +55,10 @@
     mode: '0644'
   tags: ['load_images']
 
-# - name: Ensure Docker SDK for Python is installed
-#   ansible.builtin.pip:
-#     name: docker
-#   tags: ['load_images']
+- name: Ensure Docker SDK for Python is installed
+  ansible.builtin.pip:
+    name: docker
+  tags: ['load_images']
 
 - name: Load image from archive
   community.docker.docker_image:

@@ -4,6 +4,21 @@
 
 ## Requirements
 
+- ansible 2.17.4
+  ```
+  # ansible --version
+    ansible [core 2.17.4]
+    config file = /home/lhy/github/ansible-deployment/ansible.cfg
+    configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+    ansible python module location = /usr/local/lib/python3.10/dist-packages/ansible
+    ansible collection location = /root/.ansible/collections:/usr/share/ansible/collections
+    executable location = /usr/local/bin/ansible
+    python version = 3.10.12 (main, Sep 11 2024, 15:47:36) [GCC 11.4.0] (/usr/bin/python3)
+    jinja version = 3.0.3
+    libyaml = True
+  ```
+- python 3.0+ (验证: 3.10.12)
+
 ## Installation
 
 ## Usage
