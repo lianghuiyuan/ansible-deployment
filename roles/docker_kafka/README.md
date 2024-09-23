@@ -23,9 +23,14 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+- name: 'deploy kafka'
+  hosts: 'docker_kafka'
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: true
+  roles:
+    - { role: 'docker_kafka'}
 
 License
 -------
