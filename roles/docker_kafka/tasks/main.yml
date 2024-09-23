@@ -30,3 +30,6 @@
 
 - name: main | deploy kafka with docker
   import_tasks: container.yml
+
+- name: main | init kafka service
+  import_tasks: service.yml
