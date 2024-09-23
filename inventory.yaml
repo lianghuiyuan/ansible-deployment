@@ -1,4 +1,4 @@
-test:
+docker_kafka:
   hosts:
     node10203:
       ansible_host: 192.168.10.203
@@ -12,7 +12,7 @@ test:
       ansible_host: 192.168.10.205
       ansible_ssh_user: root
       ansible_ssh_pass: jetio
-docker_kafka:
+test:
   hosts:
     node548:
       ansible_host: 192.168.5.48
