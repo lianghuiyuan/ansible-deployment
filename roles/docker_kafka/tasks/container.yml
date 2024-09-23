@@ -3,17 +3,12 @@
 # https://github.com/apache/kafka/blob/3.7/docker/examples/README.md
 # https://github.com/apache/kafka/blob/3.7/config/kraft/server.properties
 
-# - name: Print outer address
-#   debug:
-#     msg: "The outer address of {{ item }} is {{ hostvars[item]['host_outer_address'] }}"
-#   with_items: "{{ groups['docker_kafka'] }}"
-#   tags: ['debug']
 
 - name: Set quorum voters for each Kafka broker
   set_fact:
     kafka_controller_quorum_voters: "{{ kafka_controller_quorum_voters | default([]) + [hostvars[item]['kafka_broker_id'] ~ '@' ~ hostvars[item]['host_inner_address'] ~ ':' ~ hostvars[item]['kafka_host_controller_port']] }}"
   with_items: "{{ groups['docker_kafka'] }}"
-  tags: ['always']
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall']
 
 - name: Ensure directorys has correct ownership
   ansible.builtin.file:
@@ -21,7 +16,7 @@
     state: directory
     owner: 1000
     group: 1000
-    mode: |-    #'0777'
+    mode: |-
       {% if item == kafka_shell_dir -%}
       0777
       {%- else -%}
@@ -31,9 +26,8 @@
   with_items: 
     - '{{ kafka_data_dir }}'
     - '{{ kafka_config_dir }}'
-    # - '{{ kafka_shell_dir }}'
     - '{{ kafka_log_dir }}'
-  tags: ['install']
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall']
 
 - name: container | {{ docker_container_state }} kafka container
   community.docker.docker_container:
@@ -49,7 +43,6 @@
     volumes:
       - '{{ kafka_data_dir }}:{{ container_data_dir }}:rw'
       - '{{ kafka_config_dir }}:{{ kafka_config_dir }}:rw'
-      # - '{{ kafka_shell_dir }}:{{ kafka_shell_dir }}:rw'
       - '{{ kafka_log_dir }}:{{ container_log_dir }}:rw'
     env:
       KAFKA_NODE_ID: '{{ kafka_broker_id | string }}'
@@ -68,21 +61,13 @@
       # KAFKA_HEAP_OPTS: '-Xmx512M -Xms256M'
       KAFKA_NUM_PARTITIONS: '3'
       # KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false' 
-      KAFKA_LOG_RETENTION_HOURS: '168'     # 7 days
+      KAFKA_LOG_RETENTION_MS: '604800000'        # 7 days
+      KAFKA_LOG_RETENTION_BYTES: '1073741824'    # 1 GB
       KAFKA_LOG4J_LOGGER_KAFKA: 'WARN'           # DEBUG、INFO、WARN、ERROR
       KAFKA_LOG4J_ROOTLOGGER: 'WARN, stdout'
       KAFKA_LOG4J_LOGGERS: 'WARN'
       KAFKA_LOG_DIRS: '{{ container_log_dir }}'
-  tags: ['always']
-
-# - name: Create bucket-log topic with partitions and replication factor
-#   command: >
-#     kafka-topics.sh --create
-#     --zookeeper localhost:2181
-#     --replication-factor 3
-#     --partitions 3
-#     --topic bucket-log
-#   tags: ['setup', 'kafka']
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall']
 
 # - name: Create Kafka topic if it does not exist
 #   shell: |
@@ -98,6 +83,5 @@
   with_items: 
     - '{{ kafka_data_dir }}'
     - '{{ kafka_config_dir }}'
-    # - '{{ kafka_shell_dir }}'
     - '{{ kafka_log_dir }}'
   tags: ['uninstall']

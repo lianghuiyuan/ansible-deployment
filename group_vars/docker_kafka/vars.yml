@@ -7,6 +7,10 @@ image_archive_name: 'kafka_{{ version }}.tar'
 # vip: '10.162.100.127'
 # kafka_cluster_id: 'jetio_kafka_cluster'
 kafka_cluster_id: '4L6g3nShT-eMCtK--X86sw'
+topics:
+  - name: 'bucket-log'         # for logmanager
+    partitions: 3
+    replication_factor: 1
 
 kafka_shell_dir: /opt/kafka/bin
 kafka_config_dir: /opt/kafka/config

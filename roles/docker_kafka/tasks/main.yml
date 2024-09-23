@@ -25,14 +25,8 @@
     docker_container_restart: false
   tags: ['uninstall']
 
-# - name: main | login dockerhub, pull latest image and delete the expired image
-#   import_tasks: image.yml
+- name: main | login dockerhub, pull latest image and delete the expired image
+  import_tasks: image.yml
 
-# - name: main | deploy kafka with docker
-#   import_tasks: container.yml
-
-
-- name: debug vault 
-  debug:
-    msg: "Docker registry: {{ docker_registry }}, User: {{ registry_user }}, Password: {{ registry_pwd }}"
-  tags: ['always']
+- name: main | deploy kafka with docker
+  import_tasks: container.yml

@@ -1,6 +1,6 @@
 ---
 host_outer_address: '47.99.102.51'
-host_inner_address: '192.168.10.205'
+host_inner_address: '192.168.10.203'
 
 kafka_broker_id: 3
 kafka_host_broker_port: 9092

@@ -11,7 +11,7 @@
     recurse: yes
   with_items: 
     - '{{ image_archive_dir }}'
-  tags: ['install']
+  tags: ['pull_images', 'load_images']
 
 - name: 'image | Login into {{ docker_registry }} on local machine'
   delegate_to: localhost
@@ -21,20 +21,20 @@
     password: "{{ registry_pwd }}"
     reauthorize: true
     validate_certs: false
-  tags: ['install']
+  tags: ['pull_images']
 
 - name: image | Pull an image on local machine
   delegate_to: localhost
   community.docker.docker_image:
     name: '{{ image }}:{{ version }}'
     source: pull
-  tags: ['install']
+  tags: ['pull_images']
 
 - name: image | Log out of {{ docker_registry }} on local machine
   delegate_to: localhost
   community.docker.docker_login:
     state: absent
-  tags: ['install']
+  tags: ['pull_images']
 
 - name: image | Archive image on local machine
   delegate_to: localhost
@@ -44,7 +44,7 @@
     state: 'present'
     archive_path: '{{ image_local_dir }}/{{ image_archive_name }}'
     source: local
-  tags: ['install']
+  tags: ['load_images']
 
 - name: Copy file with owner and permissions
   ansible.builtin.copy:
@@ -53,12 +53,12 @@
     owner: root
     group: root
     mode: '0644'
-  tags: ['install']
+  tags: ['load_images']
 
 - name: Ensure Docker SDK for Python is installed
   ansible.builtin.pip:
     name: docker
-  tags: ['install']
+  tags: ['load_images']
 
 - name: Load image from archive
   community.docker.docker_image:
@@ -67,7 +67,7 @@
     state: 'present'
     load_path: '{{ image_archive_dir }}/{{ image_archive_name }}'
     source: load
-  tags: ['install']
+  tags: ['load_images']
 
 - name: Remove image
   community.docker.docker_image:
