@@ -22,6 +22,8 @@
 
 ## Usage
 
+> 当前通过容器运行 Ansible 因镜像中缺少模块相关模块会报错，请使用宿主机的 Ansible 执行
+
 ### 第一步：配置
 
 - 配置 `inventory.yaml` 文件
