@@ -1,17 +1,75 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+deploy kraft kafka cluster on docker
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- ansible 2.17.4
+  ```
+  # ansible --version
+    ansible [core 2.17.4]
+    config file = /home/lhy/github/ansible-deployment/ansible.cfg
+    configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+    ansible python module location = /usr/local/lib/python3.10/dist-packages/ansible
+    ansible collection location = /root/.ansible/collections:/usr/share/ansible/collections
+    executable location = /usr/local/bin/ansible
+    python version = 3.10.12 (main, Sep 11 2024, 15:47:36) [GCC 11.4.0] (/usr/bin/python3)
+    jinja version = 3.0.3
+    libyaml = True
+  ```
+- python 3.0+ (验证: 3.10.12)
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- group_vars/all/vars.yaml
+  ```
+  service_ip: '{{ host_inner_address }}'
+  cpu_arch: "{{ (ansible_architecture | lower | 
+                replace('i386', '386') | 
+                replace('x86_64', 'amd64') | 
+                replace('aarch64', 'arm64') | 
+                replace('armv7l', 'armv7') | 
+                replace('armv6l', 'armv6')) if ansible_architecture is defined else '' }}"
+  image_archive_dir: '/tmp/images'
+  ```
+- group_vars/docker_kafka/vars.yaml
+  ```
+  ---
+  version: "{{ '3.8.0_' + (cpu_arch | lower) }}"
+  image: 'registry.jetio.net/library/apache/kafka'
+  image_archive_name: 'kafka_{{ version }}.tar'
+
+  # vip: '10.162.100.127'
+  # kafka_cluster_id: 'jetio_kafka_cluster'
+  kafka_cluster_id: '4L6g3nShT-eMCtK--X86sw'
+  topics:
+    - name: 'bucket-log'         # for logmanager
+      partitions: 3
+      replication_factor: 1
+
+  kafka_shell_dir: /opt/kafka/bin
+  kafka_config_dir: /opt/kafka/config
+  kafka_log_dir: /var/log/kafka
+  kafka_data_dir: /mnt/kafka
+
+  container_shell_dir: /opt/kafka/bin
+  container_config_dir: /opt/kafka/config
+  container_log_dir: /tmp/kraft-combined-logs
+  container_data_dir: /var/lib/kafka
+  ```
+- host_vars
+  ```
+  ---
+  host_outer_address: '47.99.102.51'
+  host_inner_address: '192.168.10.203'
+
+  kafka_broker_id: 1
+  kafka_host_broker_port: 9092
+  kafka_host_controller_port: 9093
+  ```
 
 Dependencies
 ------------
@@ -40,4 +98,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+lhy.me

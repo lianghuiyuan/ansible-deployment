@@ -41,14 +41,14 @@
 - 解密文件: `ansible-vault decrypt group_vars/all/secrets.yaml`
 
 #### Ansible Playbook
-- prepare: `make prepare`
-  - 只拉取镜像: `make pull_images`
-  - 将镜像推送到远程服务器，并加载镜像: `make load_images`
-- install: `make install`
-- start: `make start`
-- stop: `make stop`
-- restart: `make restart`
-- uninstall: `make uninstall`
+- prepare: `make prepare_kafka`
+  - 只拉取镜像: `make pull_kafka_images`
+  - 将镜像推送到远程服务器，并加载镜像: `make load_kafka_images`
+- install: `make install_kafka`
+- start: `make start_kafka`
+- stop: `make stop_kafka`
+- restart: `make restart_kafka`
+- uninstall: `make uninstall_kafka`
 
 ## License
 

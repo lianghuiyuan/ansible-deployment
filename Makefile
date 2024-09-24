@@ -1,4 +1,4 @@
-USE_DOCKER=0
+USE_DOCKER=1
 WORK_PATH = $(shell echo $(shell pwd))
 CPU_ARCH := $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
@@ -8,33 +8,33 @@ else
 	PLAYBOOK=ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook
 endif
 
-.PHONY: pull_images
-pull_images:
+.PHONY: pull_kafka_images
+pull_kafka_images:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t pull_images --vault-password-file .vault_pass.txt
 
-.PHONY: load_images
-load_images:
+.PHONY: load_kafka_images
+load_kafka_images:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t pull_images --vault-password-file .vault_pass.txt
 
-.PHONY: prepare
-prepare: pull_images load_images
+.PHONY: prepare_kafka
+prepare_kafka: pull_kafka_images load_kafka_images
 
-.PHONY: install
-install:
+.PHONY: install_kafka
+install_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t install --vault-password-file .vault_pass.txt
 
-.PHONY: uninstall
-uninstall:
+.PHONY: uninstall_kafka
+uninstall_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t uninstall --vault-password-file .vault_pass.txt
 
-.PHONY: start
-start:
+.PHONY: start_kafka
+start_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t start --vault-password-file .vault_pass.txt
 
-.PHONY: stop
-stop:
+.PHONY: stop_kafka
+stop_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t stop --vault-password-file .vault_pass.txt
 
-.PHONY: restart
-restart:
+.PHONY: restart_kafka
+restart_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t restart --vault-password-file .vault_pass.txt
