@@ -1,22 +1,17 @@
 - name: service | init kafka service with create topics if needed
   block:
-    - name: Check if Kafka topic does not exist
-      shell: |
-        docker exec kafka_{{ kafka_broker_id }} /opt/kafka/bin/kafka-topics.sh --list \
-        --bootstrap-server {{ service_ip }}:{{ kafka_host_broker_port }} | grep -w {{ item.name }}
-      register: topic_check
-      ignore_errors: true
-      changed_when: false
-      failed_when: false
-      tags: ['install']
-
-    - name: Create Kafka topic if it does not exist
-      shell: |
+  - name: Check and create Kafka topic if it does not exist
+    shell: |
+      if ! docker exec kafka_{{ kafka_broker_id }} /opt/kafka/bin/kafka-topics.sh --list \
+          --bootstrap-server {{ service_ip }}:{{ kafka_host_broker_port }} | grep -w {{ item.name }}; then
         docker exec kafka_{{ kafka_broker_id }} /opt/kafka/bin/kafka-topics.sh --create --topic {{ item.name }} \
-        --bootstrap-server {{ service_ip }}:{{ kafka_host_broker_port }} \
-        --partitions {{ item.partitions }} --replication-factor {{ item.replication_factor }}
-      when: "{{ topic_check.rc != 0 }}"
-      tags: ['install']
-  loop: "{{ topics }}"
-  loop_control:
-    loop_var: item
+          --bootstrap-server {{ service_ip }}:{{ kafka_host_broker_port }} \
+          --partitions {{ item.partitions }} --replication-factor {{ item.replication_factor }};
+      fi
+    ignore_errors: true
+    changed_when: false
+    failed_when: false
+    tags: ['install']
+    loop: "{{ topics }}"
+    loop_control:
+      loop_var: item
