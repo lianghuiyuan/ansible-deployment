@@ -3,7 +3,7 @@ WORK_PATH = $(shell echo $(shell pwd))
 CPU_ARCH := $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
 ifeq ($(USE_DOCKER),1)
-	PLAYBOOK=docker run --rm -it -v $(WORK_PATH):/work -e ANSIBLE_HOST_KEY_CHECKING=False --network host -w /work registry.jetio.net/library/ansible:2.10-$(CPU_ARCH) ansible-playbook
+	PLAYBOOK=docker run --rm -it -v $(WORK_PATH):/work -e ANSIBLE_HOST_KEY_CHECKING=False --network host -w /work registry.jetio.net/library/ansible:10.4.0-$(CPU_ARCH) ansible-playbook
 else
 	PLAYBOOK=ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook
 endif

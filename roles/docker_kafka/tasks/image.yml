@@ -1,12 +1,12 @@
 ---
 # pull save load distribute 
 
-- name: Ensure directorys has correct ownership
+- name: 'image | Ensure directorys has correct ownership'
   ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: 1000
-    group: 1000
+    path: '{{ item }}'
+    state: 'directory'
+    owner: '1000'
+    group: '1000'
     mode: '0755'
     recurse: yes
   with_items: 
@@ -46,7 +46,7 @@
     source: local
   tags: ['load_images']
 
-- name: Copy file with owner and permissions
+- name: image | Copy file with owner and permissions
   ansible.builtin.copy:
     src: '{{ image_local_dir }}/{{ image_archive_name }}'
     dest: '{{ image_archive_dir }}/{{ image_archive_name }}'
@@ -55,12 +55,12 @@
     mode: '0644'
   tags: ['load_images']
 
-- name: Ensure Docker SDK for Python is installed
+- name: image | Ensure Docker SDK for Python is installed
   ansible.builtin.pip:
     name: docker
   tags: ['load_images']
 
-- name: Load image from archive
+- name: image | Load image from archive
   community.docker.docker_image:
     name: '{{ image }}'
     tag: '{{ version }}'
@@ -69,7 +69,7 @@
     source: load
   tags: ['load_images']
 
-- name: Remove image
+- name: image | Remove image
   community.docker.docker_image:
     name: '{{ image }}'
     tag: '{{ version }}'
