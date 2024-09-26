@@ -23,6 +23,8 @@
 ## Usage
 
 > 当前通过容器运行 Ansible 因镜像中缺少模块相关模块会报错，请使用宿主机的 Ansible 执行
+> macOS 执行pull_kafka_images时需要在 Ansible playbook 或 inventory 文件中设置 Ansible 使用的 Python 解释器路径ansible_python_interpreter，否则会报错提示“Failed to import the required Python library (requests) on docker-desktop's Python /usr/bin/python3” 
+> 如果是临时使用： `ansible-playbook -i ./inventory.yaml ./playbooks/kafka.yaml -e "ansible_python_interpreter=/Users/lhy/Documents/jetio/gitlabs/ansible-deployment/.venv/bin/python" -t pull_images`
 
 ### 第一步：配置
 
@@ -51,6 +53,7 @@
 - stop: `make stop_kafka`
 - restart: `make restart_kafka`
 - uninstall: `make uninstall_kafka`
+- destory: `make destory_kafka`
 
 ## License
 

@@ -74,4 +74,4 @@
     name: '{{ image }}'
     tag: '{{ version }}'
     state: 'absent'
-  tags: ['uninstall']
+  tags: ['destory']
