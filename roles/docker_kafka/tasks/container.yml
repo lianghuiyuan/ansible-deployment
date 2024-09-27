@@ -21,15 +21,16 @@
     recurse: yes
   with_items: 
     - '{{ kafka_home_dir }}'
-  tags: ['install', 'start']
+  tags: ['install', 'start', 'recreate', 'update']
 
 - name: container | {{ docker_container_state }} kafka container
   community.docker.docker_container:
     name: 'kafka_{{ kafka_broker_id }}'
     image: '{{ image }}:{{ version }}'
     hostname: 'kafka_{{ kafka_broker_id }}'
-    state: '{{ docker_container_state }}'
-    restart: '{{ docker_container_restart }}'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
     restart_policy: always
     ports:
       - "{{ kafka_host_broker_port }}:9092"
@@ -60,7 +61,7 @@
       KAFKA_CFG_LOG4J_LOGGER_KAFKA: 'WARN'           # DEBUG、INFO、WARN、ERROR
       KAFKA_CFG_LOG4J_ROOTLOGGER: 'WARN, stdout'
       KAFKA_CFG_LOG4J_LOGGERS: 'WARN'
-  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory']
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
 
 - name: remove directorys
   ansible.builtin.file:

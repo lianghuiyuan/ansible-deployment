@@ -54,6 +54,8 @@
 - restart: `make restart_kafka`
 - uninstall: `make uninstall_kafka`
 - destory: `make destory_kafka`
+- update: `make update_kafka`
+- recreate: `make recreate_kafka`
 
 ## License
 

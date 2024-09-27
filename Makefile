@@ -42,3 +42,11 @@ stop_kafka:
 .PHONY: restart_kafka
 restart_kafka:
 	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t restart
+
+.PHONY: update_kafka
+update_kafka:
+	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t update
+
+.PHONY: recreate_kafka
+recreate_kafka:
+	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t recreate
