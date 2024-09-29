@@ -27,22 +27,16 @@
 > 如果是临时使用： `ansible-playbook -i ./inventory.yaml ./playbooks/kafka.yaml -e "ansible_python_interpreter=/Users/lhy/Documents/jetio/gitlabs/ansible-deployment/.venv/bin/python" -t pull_images`
 
 ### 第一步：配置
-
-- 配置 `inventory.yaml` 文件
-- 配置 `hosts_vars/xxx.yaml` 文件
-- 配置 `group_vars/docker_kafka/xxx.yaml` 文件
+- ENV： dev-开发环境， test-测试环境， prod-生产环境
+- 通过inventories/$(ENV)目录配置服务
+  -  `hosts.yaml` 文件是主机列表
+  - 配置 `hosts_vars/xxx.yaml` 是针对单个 host 的独立配置，xxx 是主机名
+  - 配置 `group_vars/docker_kafka/xxx.yaml` docker_kafka是针对Kafka服务组的公共配置，xxx 名字无限制，可随意命名
+  - 配置 `group_vars/all/secrets.yaml` all目录下是针对所有服务的公共配置
 - 配置加密的密码文件: `ansible-vault edit group_vars/all/secrets.yaml`
 - 将加密的密钥写入`.vault_pass.txt`文件避免输入验证密钥
 
 ### 第二步：部署
-
-#### ansible-vault
-- 通过输入密码将明文文件加密: `ansible-vault encrypt group_vars/all/secrets.yaml`   
-- 通过密钥文件将明文文件加密: `ansible-vault encrypt group_vars/all/secrets.yaml --vault-password-file .vault_pass.txt`
-- 创建密码文件: `ansible-vault create group_vars/all/secrets.yaml`
-- 查看密码文件: `ansible-vault view group_vars/all/secrets.yaml`
-- 编辑密码文件: `ansible-vault edit group_vars/all/secrets.yaml`
-- 解密文件: `ansible-vault decrypt group_vars/all/secrets.yaml`
 
 #### Ansible Playbook
 - prepare: `make prepare_kafka`

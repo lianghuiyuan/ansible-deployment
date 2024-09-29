@@ -1,4 +1,5 @@
 USE_DOCKER=1
+ENV = dev
 WORK_PATH = $(shell echo $(shell pwd))
 CPU_ARCH := $(shell uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 
@@ -10,43 +11,43 @@ endif
 
 .PHONY: pull_kafka_images
 pull_kafka_images:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t pull_images
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t pull_images
 
 .PHONY: load_kafka_images
 load_kafka_images:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t pull_images
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t pull_images
 
 .PHONY: prepare_kafka
 prepare_kafka: load_kafka_images
 
 .PHONY: install_kafka
 install_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t install
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t install
 
 .PHONY: uninstall_kafka
 uninstall_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t uninstall
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t uninstall
 
 .PHONY: destory_kafka
 destory_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t uninstall
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t uninstall
 
 .PHONY: start_kafka
 start_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t start
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t start
 
 .PHONY: stop_kafka
 stop_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t stop
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t stop
 
 .PHONY: restart_kafka
 restart_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t restart
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t restart
 
 .PHONY: update_kafka
 update_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t update
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t update
 
 .PHONY: recreate_kafka
 recreate_kafka:
-	@$(PLAYBOOK) -i ./inventory.yaml ./playbooks/kafka.yaml -t recreate
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t recreate
