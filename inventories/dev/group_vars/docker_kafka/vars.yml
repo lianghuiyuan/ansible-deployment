@@ -10,7 +10,7 @@ kafka_cluster_id: '4L6g3nShT-eMCtK--X86sw'
 topics:
   - name: 'bucket-log'         # for logmanager
     partitions: 13
-    replication_factor: 1
+    replication_factor: 3
 
 kafka_home_dir: /mnt/kafka
 # kafka_shell_dir: /opt/kafka/bin
