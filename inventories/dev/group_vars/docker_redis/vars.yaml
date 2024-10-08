@@ -1,7 +1,7 @@
 # docker_registry: 'docker.elastic.co'
-version: "7.4"
-image: 'bitnami/redis'
-image_archive_name: 'redis_{{ version }}.tar'
+redis_version: "7.4"
+redis_image: 'bitnami/redis'
+redis_image_archive_name: 'redis_{{ version }}.tar'
 
 redis_port: '6379'
 redis_home_dir: '/mnt/redis'

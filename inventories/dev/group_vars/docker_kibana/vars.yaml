@@ -1,6 +1,6 @@
-version: "7.17.24"
-image: 'kibana'
-image_archive_name: 'kibana_{{ version }}.tar'
+kibana_version: "7.17.24"
+kibana_image: 'kibana'
+kibana_image_archive_name: 'kibana_{{ version }}.tar'
 
 kibana_port: 5601
 
@@ -8,4 +8,4 @@ kibana_home_dir: '/mnt/kibana'
 kibana_config_dir: '{{ kibana_home_dir }}/config'
 kibana_mem_limit: '1g'
 
-es_password: "CloudEdge@1234"
+kibana_es_password: "CloudEdge@1234"

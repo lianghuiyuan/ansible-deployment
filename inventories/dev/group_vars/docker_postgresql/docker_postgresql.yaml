@@ -1,5 +1,5 @@
-version: "17.0"
-image: 'postgres'
+postgres_version: "17.0"
+postgres_image: 'postgres'
 adminer_version: '4.8.1'
 adminer_image: 'adminer'
 postgres_image_archive_name: 'postgres_{{ version }}.tar'

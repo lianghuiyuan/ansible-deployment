@@ -46,7 +46,7 @@
 - name: container | {{ docker_container_state }} ElasticSearch container
   community.docker.docker_container:
     name: 'es_{{ es_node_id }}'
-    image: '{{ image }}:{{ version }}'
+    image: '{{ es_image }}:{{ es_version }}'
     hostname: 'es_{{ es_node_id }}'
     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
@@ -80,7 +80,7 @@
 # - name: container | {{ docker_container_state }} metricbeat container
 #   community.docker.docker_container:
 #     name: 'metricbeat'
-#     image: '{{ image }}:{{ version }}'
+#     image: '{{ es_image }}:{{ es_version }}'
 #     hostname: 'metricbeat'
 #     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
 #     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.

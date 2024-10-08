@@ -30,7 +30,7 @@
 - name: container | {{ docker_container_state }} Redis container
   community.docker.docker_container:
     name: 'redis_{{ redis_node_id }}_{{ redis_role }}'
-    image: '{{ image }}:{{ version }}'
+    image: '{{ redis_image }}:{{ redis_version }}'
     hostname: 'redis_{{ redis_node_id }}_{{ redis_role }}'
     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
@@ -50,7 +50,7 @@
 - name: container | {{ docker_container_state }} Redis container
   community.docker.docker_container:
     name: 'redis_{{ redis_node_id }}_{{ redis_role }}'
-    image: '{{ image }}:{{ version }}'
+    image: '{{ redis_image }}:{{ redis_version }}'
     hostname: 'redis_{{ redis_node_id }}_{{ redis_role }}'
     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.

@@ -42,14 +42,14 @@
 #     name: '{{ image }}'
 #     tag: '{{ version }}'
 #     state: 'present'
-#     archive_path: '{{ image_local_dir }}/{{ image_archive_name }}'
+#     archive_path: '{{ image_local_dir }}/{{ redis_image_archive_name }}'
 #     source: local
 #   tags: ['load_images']
 
 - name: image | Copy file with owner and permissions
   ansible.builtin.copy:
-    src: '{{ image_local_dir }}/{{ image_archive_name }}'
-    dest: '{{ image_archive_dir }}/{{ image_archive_name }}'
+    src: '{{ image_local_dir }}/{{ redis_image_archive_name }}'
+    dest: '{{ image_archive_dir }}/{{ redis_image_archive_name }}'
     owner: root
     group: root
     mode: '0644'
@@ -65,7 +65,7 @@
     name: '{{ image }}'
     tag: '{{ version }}'
     # state: 'present'
-    load_path: '{{ image_archive_dir }}/{{ image_archive_name }}'
+    load_path: '{{ image_archive_dir }}/{{ redis_image_archive_name }}'
     source: load
   tags: ['load_images']
 
@@ -81,5 +81,5 @@
     path: "{{ item }}"
     state: absent
   with_items: 
-    - '{{ image_archive_dir }}/{{ image_archive_name }}'
+    - '{{ image_archive_dir }}/{{ redis_image_archive_name }}'
   tags: ['destory']

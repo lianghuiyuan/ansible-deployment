@@ -1,6 +1,6 @@
-version: "0.25.6"
-image: 'nats-streaming'
-image_archive_name: 'nats_{{ version }}.tar'
+nats_version: "0.25.6"
+nats_image: 'nats-streaming'
+nats_image_archive_name: 'nats_{{ version }}.tar'
 
 stan_http_port: '4222'
 stan_report_port: '8222'

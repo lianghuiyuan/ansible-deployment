@@ -29,7 +29,7 @@
 - name: container | {{ docker_container_state }} NATS container
   community.docker.docker_container:
     name: 'nats-streaming'
-    image: '{{ image }}:{{ version }}'
+    image: '{{ nats_image }}:{{ nats_version }}'
     hostname: 'nats-streaming'
     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.

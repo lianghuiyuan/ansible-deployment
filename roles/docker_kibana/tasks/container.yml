@@ -24,7 +24,7 @@
 - name: container | {{ docker_container_state }} Kibana container
   community.docker.docker_container:
     name: 'kibana'
-    image: '{{ image }}:{{ version }}'
+    image: '{{ kibana_image }}:{{ kibana_version }}'
     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
     recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
@@ -41,7 +41,7 @@
       ELASTICSEARCH_HOSTS: "http://192.168.0.113:9200"
       # KIBANA_ELASTICSEARCH_URL: "http://192.168.0.42:9200"
       ELASTICSEARCH_USERNAME: "elastic"
-      ELASTICSEARCH_PASSWORD: "{{ es_password }}"
+      ELASTICSEARCH_PASSWORD: "{{ kibana_es_password }}"
       XPACK_SECURITY_ENABLED: "true"
       SERVER_PUBLICBASEURL: "http://{{ host_outer_address }}:5601"
   tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
