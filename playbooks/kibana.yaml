@@ -1,0 +1,8 @@
+- name: 'deploy Kibana'
+  hosts: 'docker_kibana'
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: true
+  roles:
+    - { role: 'docker_kibana'}

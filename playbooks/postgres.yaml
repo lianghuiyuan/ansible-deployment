@@ -1,0 +1,8 @@
+- name: 'deploy PostgreSQL'
+  hosts: 'docker_postgresql'
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: true
+  roles:
+    - { role: 'docker_postgresql'}

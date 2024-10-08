@@ -1,6 +1,5 @@
 ---
 
-service_ip: '{{ host_inner_address }}'
 cpu_arch: "{{ (ansible_architecture | lower | 
               replace('i386', '386') | 
               replace('x86_64', 'amd64') | 

@@ -1,0 +1,9 @@
+version: "7.17.24"
+image: 'logstash'
+image_archive_name: 'logstash_{{ version }}.tar'
+
+stan_http_port: '4222'
+stan_report_port: '8222'
+logstash_home_dir: '/mnt/logstash'
+logstash_config_dir: '/mnt/logstash/config'
+logstash_pipeline_dir: '/mnt/logstash/pipeline'

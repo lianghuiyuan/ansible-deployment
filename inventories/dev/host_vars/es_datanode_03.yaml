@@ -1,0 +1,4 @@
+host_outer_address: '218.245.96.170'
+host_inner_address: '192.168.0.113'
+
+es_node_id: '3'

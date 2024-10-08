@@ -1,0 +1,18 @@
+docker_registry: 'docker.elastic.co'
+version: "7.17.24"
+image: 'elasticsearch'
+image_archive_name: 'elasticsearch_{{ version }}.tar'
+es_node_name: '{{ inventory_hostname }}'
+
+service_ip: '{{ host_outer_address }}'
+es_http_port: '9200'
+es_transport_port: '9300'
+
+es_home_dir: '/mnt/elasticsearch'
+es_data_dir: '/mnt/elasticsearch/data'
+es_certs_dir: '/mnt/elasticsearch/certs'
+# Increase or decrease based on the available host memory (in bytes)
+es_mem_limit: '12G'                    # 设置容器内存限制 12 GB. mem_limit 应设置为大于 -Xmx 的值，以确保 JVM 堆外内存（例如，用于文件缓存、操作系统缓存等）有足够的空间。通常，建议将 mem_limit 设置为 -Xmx 的 1.5 到 2 倍，以提供额外的缓冲
+jvm_heap_size: 8g
+
+es_password: "CloudEdge@1234"

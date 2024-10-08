@@ -1,0 +1,16 @@
+version: "17.0"
+image: 'postgres'
+adminer_version: '4.8.1'
+adminer_image: 'adminer'
+postgres_image_archive_name: 'postgres_{{ version }}.tar'
+adminer_image_archive_name: 'adminer_{{ adminer_version }}.tar'
+
+postgres_port: '5432'
+adminer_port: '8080'
+postgres_user: 'postgres'
+postgres_password: 'CloudEdge@1234'
+postgres_db: 'idata'
+
+postgres_home_dir: '/mnt/postgres'
+postgres_data_dir: '/mnt/postgres/data'
+postgres_config_dir: '/mnt/postgres/config'

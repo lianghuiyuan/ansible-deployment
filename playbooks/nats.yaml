@@ -1,0 +1,8 @@
+- name: 'deploy NATS-Streaming'
+  hosts: 'docker_nats'
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: true
+  roles:
+    - { role: 'docker_nats'}

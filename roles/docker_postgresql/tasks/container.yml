@@ -1,0 +1,73 @@
+---
+# https://hub.docker.com/_/postgres
+# https://www.postgresql.org/docs/14/runtime-config.html
+
+
+- name: container | Ensure directorys has correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: '1000'
+    group: '1000'
+    mode: '0777'
+    recurse: yes
+  with_items: 
+    - '{{ postgres_data_dir }}'
+    - '{{ postgres_config_dir }}'
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: image | Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: '{{ image_local_dir }}/{{ item }}'
+    dest: '{{ postgres_config_dir }}/{{ item }}'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items: 
+    - 'postgresql.conf'
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: container | {{ docker_container_state }} PostgreSql container
+  community.docker.docker_container:
+    name: 'postgres'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'postgres'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+    restart_policy: always
+    shm_size: '256M'
+    ports:
+      - "{{ postgres_port }}:5432"
+    volumes:
+      - '{{ postgres_data_dir }}:/var/lib/postgresql/data'
+      - "{{ postgres_config_dir }}/postgresql.conf:/var/lib/postgresql/config/postgresql.conf"
+    env:
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      POSTGRES_DB: "{{ postgres_db }}"
+      PGDATA: '/var/lib/postgresql/data'
+    command: "postgres -c config_file=/var/lib/postgresql/config/postgresql.conf"
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
+
+- name: container | {{ docker_container_state }} adminer container
+  community.docker.docker_container:
+    name: 'adminer'
+    image: '{{ adminer_image }}:{{ adminer_version }}'
+    hostname: 'adminer'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+    restart_policy: always
+    ports:
+      - "{{ adminer_port }}:8080"
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
+
+- name: remove directorys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - '{{ postgres_data_dir }}'
+    - '{{ postgres_config_dir }}'
+  tags: ['destory']

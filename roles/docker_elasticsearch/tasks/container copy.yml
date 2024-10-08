@@ -1,0 +1,174 @@
+---
+# https://github.com/apache/kafka/blob/3.7/docker/examples/jvm/cluster/combined/plaintext/docker-compose.yml
+# https://github.com/apache/kafka/blob/3.7/docker/examples/README.md
+# https://github.com/apache/kafka/blob/3.7/config/kraft/server.properties
+# https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md
+
+
+- name: Set quorum voters for each Kafka broker
+  set_fact:
+    es_controller_quorum_voters: "{{ es_controller_quorum_voters | default([]) + [hostvars[item]['es_broker_id'] ~ '@' ~ hostvars[item]['host_inner_address'] ~ ':' ~ hostvars[item]['es_host_controller_port']] }}"
+  with_items: "{{ groups['docker_kafka'] }}"
+  tags: ['always']
+
+- name: container | Ensure directorys has correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: '1000'
+    group: '1000'
+    mode: '0777'
+    recurse: yes
+  with_items: 
+    - '{{ es_home_dir }}'
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: container | {{ docker_container_state }} kafka container
+  community.docker.docker_container:
+    name: 'es_setup'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'es_{{ es_node_id }}'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+    restart_policy: always
+    user: '0'   # root
+    volumes:
+      - '{{ es_certs_dir }}:/usr/share/elasticsearch/config/certs'
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es01\n"\
+          "    dns:\n"\
+          "      - es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es02\n"\
+          "    dns:\n"\
+          "      - es02\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es03\n"\
+          "    dns:\n"\
+          "      - es03\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        echo "Setting file permissions"
+        chown -R root:root config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";
+      '
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    env:
+      - node.name={{ es_node_name }}
+      - cluster.name=${CLUSTER_NAME}
+      - cluster.initial_master_nodes=es01,es02,es03
+      - discovery.seed_hosts=es02,es03
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
+  tags: ['install', 'recreate']
+
+- name: container | {{ docker_container_state }} kafka container
+  community.docker.docker_container:
+    name: 'es_{{ es_node_id }}'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'es_{{ es_node_id }}'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+    restart_policy: always
+    ports:
+      - "{{ es_http_port }}:9200"
+    volumes:
+      - '{{ es_certs_dir }}:/usr/share/elasticsearch/config/certs'
+      - '{{ es_data_dir }}:/usr/share/elasticsearch/data'
+    mem_limit: '{{ es_mem_limit }}'
+    ulimits: 
+      memlock:
+        soft: -1     # -1 means "unlimited"
+        hard: -1     # -1 means "unlimited"
+      nofile:           # nofile is means "number of files"
+        soft: 200000    # soft limit means user or process can open this number of files
+        hard: 200000    # hard limit means kernel can open this max number of files
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    env:
+      - node.name={{ es_node_name }}
+      - cluster.name=${CLUSTER_NAME}
+      - cluster.initial_master_nodes=es01,es02,es03
+      - discovery.seed_hosts=es02,es03
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es01/es01.key
+      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es01/es01.key
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=${LICENSE}
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
+
+- name: remove directorys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - '{{ es_home_dir }}'
+  tags: ['destory']

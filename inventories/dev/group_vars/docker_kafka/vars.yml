@@ -4,6 +4,8 @@ version: "{{ '3.4_' + (cpu_arch | lower) }}"
 image: 'registry.jetio.net/library/bitnami/kafka'
 image_archive_name: 'kafka_{{ version }}.tar'
 
+service_ip: '{{ host_inner_address }}'
+
 # vip: '10.162.100.127'
 # kafka_cluster_id: 'jetio_kafka_cluster'
 kafka_cluster_id: '4L6g3nShT-eMCtK--X86sw'

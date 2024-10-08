@@ -75,3 +75,11 @@
     tag: '{{ version }}'
     state: 'absent'
   tags: ['destory']
+
+- name: remove image tar file
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - '{{ image_archive_dir }}/{{ image_archive_name }}'
+  tags: ['destory']

@@ -1,0 +1,106 @@
+---
+# https://www.elastic.co/guide/en/elasticsearch/reference/7.5/docker.html
+# ENV variables: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-configuration-methods
+# https://github.com/elastic/elasticsearch/blob/main/distribution/src/config/elasticsearch.yml
+
+
+- name: Set quorum voters for each discovery node
+  set_fact:
+    es_discovery_seed_hosts: "{{ es_discovery_seed_hosts | default([]) + [hostvars[item]['host_inner_address'] ~ ':' ~ hostvars[item]['es_transport_port']] }}"
+  with_items: "{{ groups['docker_elasticsearch'] }}"
+  when: item != inventory_hostname
+  tags: ['always']
+
+- name: Set quorum voters for each initial master node
+  set_fact:
+    es_initial_master_nodes: "{{ es_initial_master_nodes | default([]) + ['es_' ~ hostvars[item]['es_node_id']] }}"
+  with_items: "{{ groups['docker_elasticsearch'] }}"
+  tags: ['always']
+
+- name: container | Ensure directorys has correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: '1000'
+    group: '1000'
+    mode: '0777'
+    recurse: yes
+  with_items: 
+    - '{{ es_home_dir }}'
+    - '{{ es_data_dir }}'
+    - '{{ es_certs_dir }}'
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: Permanently set vm.max_map_count
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^vm.max_map_count'
+    line: 'vm.max_map_count=262144'
+    state: present
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: Reload sysctl to apply the changes
+  ansible.builtin.command: sysctl -p
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: container | {{ docker_container_state }} ElasticSearch container
+  community.docker.docker_container:
+    name: 'es_{{ es_node_id }}'
+    image: '{{ image }}:{{ version }}'
+    hostname: 'es_{{ es_node_id }}'
+    state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+    restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+    recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+    restart_policy: always
+    ports:
+      - "{{ es_http_port }}:9200"
+      - "{{ es_transport_port }}:9300"
+    volumes:
+      - '{{ es_certs_dir }}:/usr/share/elasticsearch/config/certs'
+      - '{{ es_data_dir }}:/usr/share/elasticsearch/data'
+    memory: '{{ es_mem_limit }}'     # set memory limit for the container
+    ulimits: 
+      - memlock:-1:-1
+      - nofile:200000:200000
+    env:
+      ES_SETTING_NODE_NAME: es_{{ es_node_id }}
+      ES_SETTING_CLUSTER_NAME: es_cluster
+      ELASTIC_PASSWORD: "{{ es_password }}"
+      ES_SETTING_DISCOVERY_SEED__HOSTS: "{{ es_discovery_seed_hosts | join(',') }}"
+      ES_SETTING_CLUSTER_INITIAL__MASTER__NODES: "{{ es_initial_master_nodes | join(',') }}"
+      ES_SETTING_NETWORK_PUBLISH__HOST: '{{ host_inner_address }}'
+      ES_SETTING_TRANSPORT_PORT: '{{ es_transport_port }}'
+      ES_SETTING_BOOTSTRAP_MEMORY__LOCK: 'true'
+      ES_SETTING_XPACK_SECURITY_ENABLED: 'false'
+      # ES_JAVA_OPTS: "{{ es_jvm_opts }}"     # Use the -m flag to set a memory limit for the container. This removes the need to manually set the JVM size.
+  tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
+
+# # https://www.elastic.co/guide/en/beats/metricbeat/7.17/running-on-docker.html
+# # https://www.elastic.co/guide/en/beats/metricbeat/7.17/command-line-options.html#global-flags
+# - name: container | {{ docker_container_state }} metricbeat container
+#   community.docker.docker_container:
+#     name: 'metricbeat'
+#     image: '{{ image }}:{{ version }}'
+#     hostname: 'metricbeat'
+#     state: '{{ docker_container_state }}'        # choices: [absent, present, healthy, stopped, started]
+#     restart: '{{ docker_container_restart }}'    # Use with started state to force a matching container to be stopped and restarted.
+#     recreate: '{{ docker_container_recreate }}'  # Use with present and started states to force the re-creation of an existing container.
+#     restart_policy: always
+#     volumes:
+#       - '/proc:/hostfs/proc:ro'
+#       - '/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro'
+#       - '/:/hostfs:ro'
+#     command:
+#       - "-E \"output.elasticsearch.hosts=['http://{{ host_inner_address }}:{{ es_http_port }}']\""
+#       - "-E setup.kibana.host=kibana:5601"
+#   tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']
+
+- name: remove directorys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - '{{ es_home_dir }}'
+    - '{{ es_data_dir }}'
+    - '{{ es_certs_dir }}'
+  tags: ['destory']

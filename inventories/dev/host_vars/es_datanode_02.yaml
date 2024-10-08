@@ -1,0 +1,7 @@
+host_outer_address: '124.71.32.133'
+host_inner_address: '192.168.0.42'
+
+es_node_id: '2'
+
+redis_node_id: '2'
+redis_role: 'replica'  # 'slave' is desperated after 5.0, use 'replica' instead
