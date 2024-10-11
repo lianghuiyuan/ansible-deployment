@@ -61,7 +61,7 @@
       # KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: 'false' 
       KAFKA_CFG_LOG_CLEANUP_POLICY: 'delete'        # The default cleanup policy for segments beyond the retention window
       KAFKA_CFG_LOG_RETENTION_MS: '604800000'        # 7 days   删除前的缓冲时间。the maximum time we will retain a log before we will discard old log segments to free up space if we are using the "delete" retention policy.
-      KAFKA_CFG_LOG_RETENTION_BYTES: '10737418240'    # 10 GB
+      KAFKA_CFG_LOG_RETENTION_BYTES: '107374182400'    # 100 GB
       KAFKA_CFG_LOG_SEGMENT_MS: '604800000'          # 7 days
       KAFKA_CFG_LOG_SEGMENT_BYTES: '1073741824'      # 1GiB
       KAFKA_CFG_LOG4J_LOGGER_KAFKA: 'WARN'           # DEBUG、INFO、WARN、ERROR
