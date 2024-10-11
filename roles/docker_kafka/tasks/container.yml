@@ -3,6 +3,7 @@
 # https://github.com/apache/kafka/blob/3.7/docker/examples/README.md
 # https://github.com/apache/kafka/blob/3.7/config/kraft/server.properties
 # https://github.com/bitnami/containers/blob/main/bitnami/kafka/README.md
+# https://kafka.apache.org/documentation/#configuration
 
 
 - name: Set quorum voters for each Kafka broker
@@ -48,14 +49,19 @@
       KAFKA_CFG_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: '3'
+      KAFKA_CFG_REPLICATION_FACTOR: '3'
+      KAFKA_CFG_DEFAULT_REPLICATION_FACTOR: '3'
       KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS: '0'
       KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: '3'
       KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: '3'
+      KAFKA_CFG_NUM_NETWORK_THREADS: '9'       # 一般设置: CPU 核数 + 1
+      KAFKA_CFG_NUM_IO_THREADS: '16'            # 一般设置: CPU 核数 * 2，最大不超过 CPU 核数 * 3
       # KAFKA_CFG_HEAP_OPTS: '-Xms2g -Xmx2g'
       KAFKA_CFG_NUM_PARTITIONS: '13'
       # KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: 'false' 
-      KAFKA_CFG_LOG_RETENTION_MS: '604800000'        # 7 days
-      KAFKA_CFG_LOG_RETENTION_BYTES: '1073741824'    # 1 GB
+      KAFKA_CFG_LOG_CLEANUP_POLICY: 'delete'        # The default cleanup policy for segments beyond the retention window
+      KAFKA_CFG_LOG_RETENTION_MS: '604800000'        # 7 days   删除前的缓冲时间。the maximum time we will retain a log before we will discard old log segments to free up space if we are using the "delete" retention policy.
+      KAFKA_CFG_LOG_RETENTION_BYTES: '10737418240'    # 10 GB
       KAFKA_CFG_LOG_SEGMENT_MS: '604800000'          # 7 days
       KAFKA_CFG_LOG_SEGMENT_BYTES: '1073741824'      # 1GiB
       KAFKA_CFG_LOG4J_LOGGER_KAFKA: 'WARN'           # DEBUG、INFO、WARN、ERROR

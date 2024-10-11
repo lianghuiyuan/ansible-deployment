@@ -7,5 +7,3 @@ kibana_port: 5601
 kibana_home_dir: '/mnt/kibana'
 kibana_config_dir: '{{ kibana_home_dir }}/config'
 kibana_mem_limit: '1g'
-
-kibana_es_password: "CloudEdge@1234"

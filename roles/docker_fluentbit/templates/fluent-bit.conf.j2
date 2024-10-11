@@ -1,0 +1,79 @@
+[SERVICE]
+    flush            1
+    log_Level        info
+    daemon           off
+    http_server      on
+    http_listen      0.0.0.0
+    http_port        2020
+    storage.metrics  on
+    Parsers_File     parsers.conf
+
+{% for input in fluentbit.inputs %}
+
+[INPUT]
+    {% for key, value in input.items() %}
+    {{ key | trim }}{{ " " * (30 - (key | length) | abs) }}  {{ value | trim }}
+    {% endfor %}
+{% endfor %}
+    
+{% for log_filter in fluentbit.filters %}
+
+[FILTER]
+    {% for key, value in log_filter.items() %}
+    {{ key | trim }}{{ " " * (30 - (key | length) | abs) }}  {{ value | trim }}
+    {% endfor %}
+{% endfor %}
+
+{% for output in fluentbit.outputs %}
+
+[OUTPUT]
+{% if output.name | trim | lower == 'loki' %}
+    Name            {{ output.name | trim }}
+    Match           {{ output.match | trim }}
+    host            {{ output.host | trim }}
+    port            {{ output.port | trim }}
+    tenant_id       {{ output.tenant_id | trim }}
+    Labels          {% for label_key, label_value in output.labels.items() %}{{ label_key | trim }}={{ label_value | trim }}{% if not loop.last %},{% endif %}{% endfor %}
+{% elif output.name | trim | lower == 'kafka' %}
+    Name            {{ output.name | trim }}
+    Match           {{ output.match | trim }}
+    {% if output.brokers is defined %}
+    Brokers         {{ output.brokers | join(', ') | trim }}
+    {% endif %}
+    {% if output.topics is defined %}
+    Topics          {{ output.topics | join(', ') | trim }}
+    {% endif %}
+    {% if output.topic_key is defined %}
+    Topic_Key       {{ output.topic_key | trim }}
+    {% endif %}
+    {% if output.message_key is defined %}
+    Message_Key     {{ output.message_key | trim }}
+    {% endif %}
+    {% if output.message_key_field is defined %}
+    Message_Key_Field {{ output.message_key_field | trim }}
+    {% endif %}
+    {% if output.timestamp_key is defined %}
+    Timestamp_Key   {{ output.timestamp_key | trim }}
+    {% endif %}
+    {% if output.timestamp_format is defined %}
+    Timestamp_Format {{ output.timestamp_format | trim }}
+    {% endif %}
+    Retry_Limit                            false
+    rdkafka.log.connection.close           false
+    rdkafka.queue.buffering.max.kbytes     1048576
+    rdkafka.request.required.acks          1
+{% else %}
+    Name            {{ output.name | trim }}
+    Match           {{ output.match | trim }}
+    host            {{ output.host | trim }}
+    port            {{ output.port | trim }}
+    tenant_id       {{ output.tenant_id | trim }}
+    Labels          {% for label_key, label_value in output.labels.items() %}
+                    {{ label_key | trim }}={{ label_value | trim }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+{% endif %}
+{% endfor %}
+
+# [OUTPUT]
+#     name             stdout
+#     Match            jetmon.*

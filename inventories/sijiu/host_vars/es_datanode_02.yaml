@@ -1,0 +1,6 @@
+host_inner_address: '172.16.10.157'
+
+es_node_id: '2'
+
+redis_node_id: '2'
+redis_role: 'replica'  # 'slave' is desperated after 5.0, use 'replica' instead

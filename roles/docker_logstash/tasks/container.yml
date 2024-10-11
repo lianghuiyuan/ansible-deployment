@@ -39,7 +39,7 @@
       LOG_LEVEL: warn
       LOG_FORMAT: json
       ELASTIC_USERNAME: 'elastic'
-      ELASTIC_PASSWORD: "CloudEdge@1234"
+      ELASTIC_PASSWORD: "c2#Tq3b*rY6"
       ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
       LS_JAVA_OPTS: "-Xmx512m -Xms512m"
   tags: ['install', 'start', 'stop', 'restart', 'uninstall','destory', 'recreate', 'update']

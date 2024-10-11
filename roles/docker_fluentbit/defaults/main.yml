@@ -1,2 +1,183 @@
 ---
 # defaults file for docker_fluentbit
+
+
+fluentbit_setup_script_dest_path: /opt/fluentbit
+fluentbit_data_dir: /mnt/fluentbit/data
+fluentbit_config_dir: '{{ fluentbit_setup_script_dest_path }}/config'
+
+
+fluentbit:
+  image: registry.jetio.net/library/fluent/fluent-bit
+  tag: 2.2.2_amd64
+  port_tcp: 2020
+  port_http: 24224
+  port_syslog: 5140
+  # log_level: warn
+  inputs:
+    - name: forward
+      listen: 0.0.0.0
+      port: 24224
+      buffer_chunk_size: 1M
+      buffer_max_size: 5M
+      tag: jetmon.forward
+    - name: tail
+      path: /opt/docker-services.d/s3gw-*/log/s3gw.log
+      read_from_head: false
+      tag: jetmon.s3gw
+    - name: tail
+      path: /var/log/mgw/mgw.log
+      read_from_head: false
+      tag: jetmon.mgw
+    - Name: tail  
+      path: /var/log/apisix/access.log
+      refresh_interval: 5
+      rotate_wait: 30
+      db: /var/log/fluentbit-offsets.db
+      db.sync: normal
+      read_from_head: false
+      tag: jetmon.l7lb
+    - name: systemd
+      tag: jetmon.jlmaster
+      systemd_filter: _SYSTEMD_UNIT=jlmaster@plane*.service
+      read_from_tail: on
+    - name: systemd
+      tag: jetmon.jlminion
+      systemd_filter: _SYSTEMD_UNIT=jlminion@plane*.service
+      read_from_tail: on
+    - name: systemd
+      tag: jetmon.jlmount
+      systemd_filter: _SYSTEMD_UNIT=jlmount@*.service
+      read_from_tail: on
+    - Name: tail  
+      path: /var/log/generated-logs.log
+      read_from_head: false
+      tag: jetmon.test
+  filters:
+    - name: parser
+      match: ^(?!jetmon\.(l7lb|mgw)$).*
+      key_name: log
+      parser: json
+      preserve_key: false
+      reserve_data: true
+    - name: parser
+      match: jetmon.l7lb
+      key_name: log
+      parser: l7lb-apisix
+      preserve_key: false
+      reserve_data: true
+    - name: parser
+      match: jetmon.mgw
+      key_name: log
+      parser: mgw
+      reserve_data: true
+    - name: rewrite_tag
+      match: jetmon.mgw
+      rule: $type ^(user|bucket|node|edge)$ jetmon.mgw.$type false
+      Emitter_Name: re_emitted
+  outputs:
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.s3gw
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: s3gw
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.jetlake
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: jetlake
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.jlmaster
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: jlmaster
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.jlminion
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: jlminion
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.mgw.user
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: mgw
+        function: auditlog
+        type: user
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.mgw.bucket
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: mgw
+        function: auditlog
+        type: bucket
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.mgw.node
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: mgw
+        function: auditlog
+        type: node
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.mgw.edge
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: mgw
+        function: auditlog
+        type: edge
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.l7lb
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: l7lb
+        function: auditlog
+    - name: kafka
+      match: jetmon.l7lb
+      brokers: ["192.168.5.50:9092"]
+      topics: ["bucket-log"]
+      message_key: bucket_default
+      message_key_field: bucket
+      timestamp_fey: time
+      timestamp_format: iso8601
+    - name: loki
+      host: '192.168.1.63'
+      port: '3100'
+      match: jetmon.test
+      tenant_id: jetio
+      labels:
+        job: fluent-bit
+        service: flog
+    # - name: not-loki
+    #   match: jetmon.jlmount
+    #   host: 132.254.236.189
+    #   port: 3100
+    #   tenant_id: jetio
+    #   labels:
+    #     job: fluent-bit
+    #     service: jlmount

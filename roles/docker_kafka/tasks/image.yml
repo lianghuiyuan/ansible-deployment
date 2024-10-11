@@ -26,7 +26,7 @@
 - name: image | Pull an image on local machine
   delegate_to: localhost
   community.docker.docker_image:
-    name: '{{ image }}:{{ version }}'
+    name: '{{ kafka_image }}:{{ kafka_version }}'
     source: pull
   tags: ['pull_images']
 
@@ -39,8 +39,8 @@
 - name: image | Archive image on local machine
   delegate_to: localhost
   community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
+    name: '{{ kafka_image }}'
+    tag: '{{ kafka_version }}'
     state: 'present'
     archive_path: '{{ image_local_dir }}/{{ kafka_image_archive_name }}'
     source: local
@@ -62,8 +62,8 @@
 
 - name: image | Load image from archive
   community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
+    name: '{{ kafka_image }}'
+    tag: '{{ kafka_version }}'
     # state: 'present'
     load_path: '{{ image_archive_dir }}/{{ kafka_image_archive_name }}'
     source: load
@@ -71,8 +71,8 @@
 
 - name: image | Remove image
   community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
+    name: '{{ kafka_image }}'
+    tag: '{{ kafka_version }}'
     state: 'absent'
   tags: ['destory']
 

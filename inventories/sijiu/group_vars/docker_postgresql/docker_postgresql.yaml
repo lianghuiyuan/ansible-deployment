@@ -8,7 +8,6 @@ adminer_image_archive_name: 'adminer_{{ adminer_version }}.tar'
 postgres_port: '5432'
 adminer_port: '8080'
 postgres_user: 'postgres'
-postgres_password: 'CloudEdge@1234'
 postgres_db: 'idata'
 
 postgres_home_dir: '/mnt/postgres'

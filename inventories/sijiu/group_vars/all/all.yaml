@@ -1,0 +1,17 @@
+---
+
+cpu_arch: "{{ (ansible_architecture | lower | 
+              replace('i386', '386') | 
+              replace('x86_64', 'amd64') | 
+              replace('aarch64', 'arm64') | 
+              replace('armv7l', 'armv7') | 
+              replace('armv6l', 'armv6')) if ansible_architecture is defined else '' }}"
+image_archive_dir: '/tmp/images'
+
+# hagroup_id: 3
+# fluentbit_src_path: ../../../fluentbit
+# fluentbit_dest_path: /opt/fluentbit
+# jetmon_server_src_path: ../../../jetmon-server
+# jetmon_server_dest_path: /opt/jetmon-server
+# exporters_src_path: ../../../exporters
+# exporters_dest_path: /opt/exporters

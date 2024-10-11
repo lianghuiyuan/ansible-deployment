@@ -23,7 +23,7 @@ prepare_kafka: load_kafka_images
 
 .PHONY: install_kafka
 install_kafka:
-	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t install
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kafka.yaml -t install -vvvvv
 
 .PHONY: uninstall_kafka
 uninstall_kafka:
@@ -68,7 +68,7 @@ prepare_es: load_es_images
 
 .PHONY: install_es
 install_es:
-	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/elasticsearch.yaml -t install -vvvv
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/elasticsearch.yaml -t install
 
 .PHONY: uninstall_es
 uninstall_es:
@@ -113,7 +113,7 @@ prepare_kibana: load_kibana_images
 
 .PHONY: install_kibana
 install_kibana:
-	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kibana.yaml -t install -vvv
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/kibana.yaml -t install
 
 .PHONY: uninstall_kibana
 uninstall_kibana:
@@ -249,7 +249,7 @@ prepare_postgres: load_postgres_images
 
 .PHONY: install_postgres
 install_postgres:
-	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/postgres.yaml -t install -vvvvvv
+	@$(PLAYBOOK) -i ./inventories/$(ENV) ./playbooks/postgres.yaml -t install
 
 .PHONY: uninstall_postgres
 uninstall_postgres:

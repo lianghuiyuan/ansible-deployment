@@ -16,6 +16,8 @@ Icon
 .vault_pass.txt
 .vault*.txt
 
+./inventories/sijiu/
+
 .vscode
 # python env
 .venv

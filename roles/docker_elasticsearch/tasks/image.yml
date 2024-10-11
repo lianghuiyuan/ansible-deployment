@@ -70,8 +70,8 @@
 
 - name: image | Load image from archive
   community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
+    name: '{{ es_image }}'
+    tag: '{{ es_version }}'
     # state: 'present'
     load_path: '{{ image_archive_dir }}/{{ es_image_archive_name }}'
     source: load
@@ -79,8 +79,8 @@
 
 - name: image | Remove image
   community.docker.docker_image:
-    name: '{{ image }}'
-    tag: '{{ version }}'
+    name: '{{ es_image }}'
+    tag: '{{ es_version }}'
     state: 'absent'
   tags: ['destory']
 

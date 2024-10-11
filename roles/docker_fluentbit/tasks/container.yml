@@ -1,0 +1,43 @@
+---
+
+- name: container | Ensure directorys has correct ownership
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: '1000'
+    group: '1000'
+    mode: '0755'
+    recurse: yes
+  with_items: 
+    - '{{ fluentbit_data_dir }}'
+    - '{{ fluentbit_config_dir }}'
+    - '{{ fluentbit_setup_script_dest_path }}'
+  tags: ['install', 'start', 'recreate', 'update']
+
+- name: Copy docker-compose template to dest dir.
+  ansible.builtin.template:
+    src: '{{ item.src }}'
+    dest: "{{ item.dest }}"
+    mode: '0640'
+  with_items: 
+    - {src: templates/docker-compose-fluentbit.yaml.j2, dest: '{{ fluentbit_setup_script_dest_path }}/docker-compose.yaml'}
+    - {src: templates/fluent-bit.conf.j2, dest: '{{ fluentbit_config_dir }}/fluent-bit.conf'}
+  tags: ['install', 'start', 'recreate', 'update']
+
+# # TODO: The first time this playbook is run, the `pi` user may not be added
+# # to the `docker` group, so this task may fail.
+# - name: Ensure fluentbit is running.
+#   community.docker.docker_compose_v2:
+#     project_src: "{{ fluentbit_setup_script_dest_path }}/"
+#     build: never
+#   become: false
+
+
+- name: remove directorys
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - '{{ postgres_data_dir }}'
+    - '{{ postgres_config_dir }}'
+  tags: ['destory']

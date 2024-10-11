@@ -1,0 +1,6 @@
+host_inner_address: '172.16.10.156'
+
+es_node_id: '1'
+
+redis_node_id: '1'
+redis_role: 'master'
